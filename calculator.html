@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator - macOS Mockup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background: #f1f1f1; display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <div class="calc-layout" id="standalone-calc">
+        <div class="calc-display" id="calc-display">0</div>
+        <button class="calc-btn gray">AC</button>
+        <button class="calc-btn gray">+/-</button>
+        <button class="calc-btn gray">%</button>
+        <button class="calc-btn orange">÷</button>
+        <button class="calc-btn">7</button>
+        <button class="calc-btn">8</button>
+        <button class="calc-btn">9</button>
+        <button class="calc-btn orange">×</button>
+        <button class="calc-btn">4</button>
+        <button class="calc-btn">5</button>
+        <button class="calc-btn">6</button>
+        <button class="calc-btn orange">-</button>
+        <button class="calc-btn">1</button>
+        <button class="calc-btn">2</button>
+        <button class="calc-btn">3</button>
+        <button class="calc-btn orange">+</button>
+        <button class="calc-btn" style="grid-column: span 2; width: 110px; border-radius: 25px;">0</button>
+        <button class="calc-btn">.</button>
+        <button class="calc-btn orange">=</button>
+    </div>
+    <script>
+        // Simple standalone logic for demo
+        const display = document.getElementById('calc-display');
+        const buttons = document.querySelectorAll('.calc-btn');
+        let currentInput = '';
+        let operator = null;
+        let previousInput = '';
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const value = btn.textContent;
+                if (!isNaN(value) || value === '.') {
+                    currentInput += value;
+                    display.textContent = currentInput;
+                } else if (value === 'AC') {
+                    currentInput = ''; previousInput = ''; operator = null;
+                    display.textContent = '0';
+                } else if (['+', '-', '×', '÷'].includes(value)) {
+                    operator = value; previousInput = currentInput; currentInput = '';
+                } else if (value === '=') {
+                    if (operator && previousInput && currentInput) {
+                        const prev = parseFloat(previousInput);
+                        const current = parseFloat(currentInput);
+                        let result;
+                        switch(operator) {
+                            case '+': result = prev + current; break;
+                            case '-': result = prev - current; break;
+                            case '×': result = prev * current; break;
+                            case '÷': result = prev / current; break;
+                        }
+                        display.textContent = result;
+                        currentInput = result.toString();
+                        operator = null;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

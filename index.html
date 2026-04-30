@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>macOS Mockup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="desktop">
+        <header id="menu-bar">
+            <div class="menu-left">
+                <span class="apple-logo"></span>
+                <span class="app-name">Finder</span>
+                <span class="menu-item">File</span>
+                <span class="menu-item">Edit</span>
+                <span class="menu-item">View</span>
+                <span class="menu-item">Go</span>
+                <span class="menu-item">Window</span>
+                <span class="menu-item">Help</span>
+            </div>
+            <div class="menu-right">
+                <span class="status-item">Wi-Fi</span>
+                <span class="status-item">Battery</span>
+                <span id="clock"></span>
+            </div>
+        </header>
+
+        <main id="window-container">
+            <!-- Windows will be rendered here -->
+        </main>
+
+        <footer id="dock-container">
+            <div id="dock">
+                <div class="dock-item" data-app="finder" title="Finder">
+                    <div class="icon-placeholder">F</div>
+                </div>
+                <div class="dock-item" data-app="safari" title="Safari">
+                    <div class="icon-placeholder">S</div>
+                </div>
+                <div class="dock-item" data-app="notes" title="Notes">
+                    <div class="icon-placeholder">N</div>
+                </div>
+                <div class="dock-item" data-app="calculator" title="Calculator">
+                    <div class="icon-placeholder">C</div>
+                </div>
+                <div class="dock-item" data-app="settings" title="System Settings">
+                    <div class="icon-placeholder">⚙️</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Window Template -->
+    <template id="window-template">
+        <div class="window" style="top: 100px; left: 100px;">
+            <div class="window-header">
+                <div class="traffic-lights">
+                    <div class="traffic-light close"></div>
+                    <div class="traffic-light minimize"></div>
+                    <div class="traffic-light maximize"></div>
+                </div>
+                <div class="window-title">App Name</div>
+            </div>
+            <div class="window-content">
+                <!-- App content goes here -->
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+</html>
