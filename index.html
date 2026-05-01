@@ -7,7 +7,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="desktop">
+    <div id="login-screen">
+        <div class="login-content">
+            <div class="user-avatar">👤</div>
+            <div class="user-name">User</div>
+            <div class="password-field">
+                <input type="password" id="login-password" placeholder="Enter Password" />
+                <button id="login-btn">→</button>
+            </div>
+            <div class="login-footer">
+                <span>Sleep</span>
+                <span>Restart</span>
+                <span>Shut Down</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="desktop" style="display: none;">
         <header id="menu-bar">
             <div class="menu-left">
                 <span class="apple-logo"></span>
@@ -27,11 +43,46 @@
         </header>
 
         <main id="window-container">
+            <div id="desktop-icons">
+                <div class="desktop-icon" data-app="finder">
+                    <div class="icon-box">📁</div>
+                    <span>Macintosh HD</span>
+                </div>
+            </div>
             <!-- Windows will be rendered here -->
         </main>
 
+        <div id="launchpad" style="display: none;">
+            <div class="launchpad-grid">
+                <div class="launchpad-item" data-app="finder">
+                    <div class="launchpad-icon">📁</div>
+                    <span>Finder</span>
+                </div>
+                <div class="launchpad-item" data-app="safari">
+                    <div class="launchpad-icon">🌐</div>
+                    <span>Safari</span>
+                </div>
+                <div class="launchpad-item" data-app="notes">
+                    <div class="launchpad-icon">📝</div>
+                    <span>Notes</span>
+                </div>
+                <div class="launchpad-item" data-app="calculator">
+                    <div class="launchpad-icon">🔢</div>
+                    <span>Calculator</span>
+                </div>
+                <div class="launchpad-item" data-app="settings">
+                    <div class="launchpad-icon">⚙️</div>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
         <footer id="dock-container">
             <div id="dock">
+                <div class="dock-item" id="launchpad-trigger" title="Launchpad">
+                    <div class="icon-placeholder">🚀</div>
+                </div>
+                <div class="dock-divider"></div>
                 <div class="dock-item" data-app="finder" title="Finder">
                     <div class="icon-placeholder">F</div>
                 </div>

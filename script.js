@@ -1,6 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('macOS Mockup initialized');
 
+    // Login Logic
+    const loginBtn = document.getElementById('login-btn');
+    const loginPassword = document.getElementById('login-password');
+    const loginScreen = document.getElementById('login-screen');
+    const desktop = document.getElementById('desktop');
+
+    function handleLogin() {
+        loginScreen.style.opacity = '0';
+        setTimeout(() => {
+            loginScreen.style.display = 'none';
+            desktop.style.display = 'flex';
+        }, 500);
+    }
+
+    loginBtn.addEventListener('click', handleLogin);
+    loginPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+
     // Update Clock
     function updateClock() {
         const now = new Date();
@@ -77,6 +96,77 @@ document.addEventListener('DOMContentLoaded', () => {
         // App-specific logic initialization
         if (appName === 'Calculator') {
             initCalculator(windowEl);
+        } else if (appName === 'Finder') {
+            initFinder(windowEl);
+        } else if (appName === 'Safari') {
+            initSafari(windowEl);
+        }
+    }
+
+    function initSafari(windowEl) {
+        const addressBar = windowEl.querySelector('.address-bar input');
+        const content = windowEl.querySelector('.safari-content h1');
+        const winTitle = windowEl.querySelector('.window-title');
+
+        addressBar.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const url = addressBar.value;
+                content.textContent = `Loading ${url}...`;
+                setTimeout(() => {
+                    content.textContent = `Welcome to ${url}`;
+                    winTitle.textContent = url;
+                }, 1000);
+            }
+        });
+    }
+
+    function initFinder(windowEl) {
+        const sidebarItems = windowEl.querySelectorAll('.folder-item');
+        const fileGrid = windowEl.querySelector('.file-grid');
+
+        const files = {
+            'Favorites': [
+                { name: 'Project 1', icon: '📁' },
+                { name: 'Resume.pdf', icon: '📄' }
+            ],
+            'Applications': [
+                { name: 'Safari', icon: '🌐' },
+                { name: 'Notes', icon: '📝' },
+                { name: 'Calculator', icon: '🔢' }
+            ],
+            'Desktop': [
+                { name: 'Macintosh HD', icon: '📁' }
+            ],
+            'Documents': [
+                { name: 'Budget.xlsx', icon: '📊' },
+                { name: 'Meeting Notes', icon: '📝' }
+            ],
+            'Downloads': [
+                { name: 'Installer.pkg', icon: '📦' }
+            ]
+        };
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                const folder = item.textContent;
+                renderFiles(folder);
+            });
+        });
+
+        function renderFiles(folder) {
+            fileGrid.innerHTML = '';
+            const folderFiles = files[folder] || [];
+            folderFiles.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-icon" style="display:flex; justify-content:center; align-items:center; font-size:30px;">${file.icon}</div>
+                    <span>${file.name}</span>
+                `;
+                fileGrid.appendChild(fileItem);
+            });
         }
     }
 
@@ -217,14 +307,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Dock interaction
-    document.querySelectorAll('.dock-item').forEach(item => {
-        item.addEventListener('click', () => {
+    // Launchpad Logic
+    const launchpad = document.getElementById('launchpad');
+    const launchpadTrigger = document.getElementById('launchpad-trigger');
+
+    function toggleLaunchpad() {
+        if (launchpad.style.display === 'none') {
+            launchpad.style.display = 'flex';
+            launchpad.style.opacity = '0';
+            setTimeout(() => launchpad.style.opacity = '1', 10);
+        } else {
+            launchpad.style.opacity = '0';
+            setTimeout(() => launchpad.style.display = 'none', 300);
+        }
+    }
+
+    launchpadTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleLaunchpad();
+    });
+
+    launchpad.addEventListener('click', () => {
+        toggleLaunchpad();
+    });
+
+    // Desktop and Dock interaction
+    document.querySelectorAll('.dock-item:not(#launchpad-trigger), .desktop-icon, .launchpad-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
             const app = item.getAttribute('data-app');
-            const appTitle = item.getAttribute('title');
+            const appTitle = item.getAttribute('title') || app.charAt(0).toUpperCase() + app.slice(1);
 
             // Check if window already exists
-            const existing = Array.from(windowContainer.children).find(win => win.querySelector('.window-title').textContent === appTitle);
+            const existing = Array.from(windowContainer.children).find(win => win.querySelector('.window-title').textContent === appTitle || win.querySelector('.window-title').textContent === app);
             if (existing) {
                 highestZIndex++;
                 existing.style.zIndex = highestZIndex;
