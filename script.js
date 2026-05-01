@@ -15,16 +15,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    loginBtn.addEventListener('click', handleLogin);
-    loginPassword.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
+    if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+    if (loginPassword) {
+        loginPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+    }
 
     // Update Clock
     function updateClock() {
         const now = new Date();
         const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        document.getElementById('clock').textContent = now.toLocaleString('en-US', options);
+        const clockEl = document.getElementById('clock');
+        if (clockEl) clockEl.textContent = now.toLocaleString('en-US', options);
     }
     updateClock();
     setInterval(updateClock, 60000);
@@ -33,28 +36,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const windowTemplate = document.getElementById('window-template');
     let highestZIndex = 10;
 
-    function createWindow(appName, content) {
+    function createWindow(appId, appName) {
         const clone = windowTemplate.content.cloneNode(true);
         const windowEl = clone.querySelector('.window');
+        windowEl.setAttribute('data-app-id', appId);
         windowEl.querySelector('.window-title').textContent = appName;
-        windowEl.querySelector('.window-content').innerHTML = content;
+
+        // Use iframe to load app content from standalone files
+        const iframe = document.createElement('iframe');
+        iframe.src = `${appId}.html`;
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        iframe.style.borderRadius = '0 0 12px 12px';
+        windowEl.querySelector('.window-content').appendChild(iframe);
+        windowEl.querySelector('.window-content').style.padding = '0';
+
+        // Initial size
+        windowEl.style.width = '600px';
+        windowEl.style.height = '450px';
 
         // Randomish initial position
         const offset = (windowContainer.children.length * 30) % 200;
-        windowEl.style.top = (100 + offset) + 'px';
-        windowEl.style.left = (100 + offset) + 'px';
+        windowEl.style.top = (80 + offset) + 'px';
+        windowEl.style.left = (80 + offset) + 'px';
 
         // Bring to front on click
         windowEl.addEventListener('mousedown', () => {
             highestZIndex++;
             windowEl.style.zIndex = highestZIndex;
-            document.querySelector('.app-name').textContent = appName;
+            const appNameEl = document.querySelector('.app-name');
+            if (appNameEl) appNameEl.textContent = appName;
         });
 
-        // Close functionality
+        // Traffic lights
         windowEl.querySelector('.close').addEventListener('click', (e) => {
             e.stopPropagation();
             windowEl.remove();
+            const dockItem = document.querySelector(`.dock-item[data-app="${appId}"]`);
+            if (dockItem) {
+                const others = Array.from(windowContainer.children).filter(win => win.getAttribute('data-app-id') === appId);
+                if (others.length === 0) {
+                    dockItem.classList.remove('running');
+                }
+            }
+        });
+
+        windowEl.querySelector('.minimize').addEventListener('click', (e) => {
+            e.stopPropagation();
+            windowEl.style.display = 'none';
+            const dockItem = document.querySelector(`.dock-item[data-app="${appId}"]`);
+            if (dockItem) dockItem.classList.add('running');
+        });
+
+        windowEl.querySelector('.maximize').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (windowEl.style.width === '100%') {
+                windowEl.style.width = '600px';
+                windowEl.style.height = '450px';
+                windowEl.style.top = '100px';
+                windowEl.style.left = '100px';
+            } else {
+                windowEl.style.width = '100%';
+                windowEl.style.height = 'calc(100% - 25px)';
+                windowEl.style.top = '25px';
+                windowEl.style.left = '0';
+            }
         });
 
         // Drag functionality
@@ -93,226 +140,101 @@ document.addEventListener('DOMContentLoaded', () => {
 
         windowContainer.appendChild(windowEl);
 
-        // App-specific logic initialization
-        if (appName === 'Calculator') {
-            initCalculator(windowEl);
-        } else if (appName === 'Finder') {
-            initFinder(windowEl);
-        } else if (appName === 'Safari') {
-            initSafari(windowEl);
-        }
-    }
+        const dockItem = document.querySelector(`.dock-item[data-app="${appId}"]`);
+        if (dockItem) dockItem.classList.add('running');
 
-    function initSafari(windowEl) {
-        const addressBar = windowEl.querySelector('.address-bar input');
-        const content = windowEl.querySelector('.safari-content h1');
-        const winTitle = windowEl.querySelector('.window-title');
-
-        addressBar.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const url = addressBar.value;
-                content.textContent = `Loading ${url}...`;
-                setTimeout(() => {
-                    content.textContent = `Welcome to ${url}`;
-                    winTitle.textContent = url;
-                }, 1000);
-            }
-        });
-    }
-
-    function initFinder(windowEl) {
-        const sidebarItems = windowEl.querySelectorAll('.folder-item');
-        const fileGrid = windowEl.querySelector('.file-grid');
-
-        const files = {
-            'Favorites': [
-                { name: 'Project 1', icon: '📁' },
-                { name: 'Resume.pdf', icon: '📄' }
-            ],
-            'Applications': [
-                { name: 'Safari', icon: '🌐' },
-                { name: 'Notes', icon: '📝' },
-                { name: 'Calculator', icon: '🔢' }
-            ],
-            'Desktop': [
-                { name: 'Macintosh HD', icon: '📁' }
-            ],
-            'Documents': [
-                { name: 'Budget.xlsx', icon: '📊' },
-                { name: 'Meeting Notes', icon: '📝' }
-            ],
-            'Downloads': [
-                { name: 'Installer.pkg', icon: '📦' }
-            ]
+        // Sync theme on load
+        iframe.onload = () => {
+            const isDark = document.body.classList.contains('dark-mode');
+            iframe.contentWindow.postMessage({ type: 'sync-dark-mode', isDark }, '*');
         };
+    }
 
-        sidebarItems.forEach(item => {
-            item.addEventListener('click', () => {
-                sidebarItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                const folder = item.textContent;
-                renderFiles(folder);
+    // Theme Management via postMessage
+    window.addEventListener('message', (event) => {
+        if (event.data.type === 'toggle-dark-mode') {
+            if (event.data.isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            // Propagate to all other iframes
+            document.querySelectorAll('iframe').forEach(iframe => {
+                iframe.contentWindow.postMessage({ type: 'sync-dark-mode', isDark: event.data.isDark }, '*');
             });
-        });
+        }
+    });
 
-        function renderFiles(folder) {
-            fileGrid.innerHTML = '';
-            const folderFiles = files[folder] || [];
-            folderFiles.forEach(file => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <div class="file-icon" style="display:flex; justify-content:center; align-items:center; font-size:30px;">${file.icon}</div>
-                    <span>${file.name}</span>
-                `;
-                fileGrid.appendChild(fileItem);
-            });
+    // Spotlight Logic
+    const spotlightOverlay = document.getElementById('spotlight-overlay');
+    const spotlightBtn = document.getElementById('spotlight-btn');
+    const spotlightInput = document.getElementById('spotlight-input');
+    const spotlightResults = document.getElementById('spotlight-results');
+
+    function toggleSpotlight() {
+        if (!spotlightOverlay) return;
+        if (spotlightOverlay.style.display === 'none' || !spotlightOverlay.style.display) {
+            spotlightOverlay.style.display = 'block';
+            spotlightInput.focus();
+        } else {
+            spotlightOverlay.style.display = 'none';
+            spotlightInput.value = '';
+            spotlightResults.innerHTML = '';
         }
     }
 
-    function initCalculator(windowEl) {
-        const display = windowEl.querySelector('#calc-display');
-        const buttons = windowEl.querySelectorAll('.calc-btn');
-        let currentInput = '';
-        let operator = null;
-        let previousInput = '';
+    if (spotlightBtn) {
+        spotlightBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSpotlight();
+        });
+    }
 
-        buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const value = btn.textContent;
+    if (spotlightInput) {
+        spotlightInput.addEventListener('input', () => {
+            const query = spotlightInput.value.toLowerCase();
+            spotlightResults.innerHTML = '';
+            if (!query) return;
 
-                if (!isNaN(value) || value === '.') {
-                    currentInput += value;
-                    display.textContent = currentInput;
-                } else if (value === 'AC') {
-                    currentInput = '';
-                    previousInput = '';
-                    operator = null;
-                    display.textContent = '0';
-                } else if (['+', '-', '×', '÷'].includes(value)) {
-                    operator = value;
-                    previousInput = currentInput;
-                    currentInput = '';
-                } else if (value === '=') {
-                    if (operator && previousInput && currentInput) {
-                        const prev = parseFloat(previousInput);
-                        const current = parseFloat(currentInput);
-                        let result;
-                        switch(operator) {
-                            case '+': result = prev + current; break;
-                            case '-': result = prev - current; break;
-                            case '×': result = prev * current; break;
-                            case '÷': result = prev / current; break;
-                        }
-                        display.textContent = result;
-                        currentInput = result.toString();
-                        operator = null;
-                    }
-                }
+            const apps = [
+                { name: 'Finder', icon: '📁', id: 'finder' },
+                { name: 'Safari', icon: '🌐', id: 'safari' },
+                { name: 'Notes', icon: '📝', id: 'notes' },
+                { name: 'Calculator', icon: '🔢', id: 'calculator' },
+                { name: 'Settings', icon: '⚙️', id: 'settings' },
+                { name: 'Terminal', icon: '📟', id: 'terminal' },
+                { name: 'App Store', icon: '🏬', id: 'appstore' }
+            ];
+
+            const filtered = apps.filter(app => app.name.toLowerCase().includes(query));
+            filtered.forEach(app => {
+                const item = document.createElement('div');
+                item.className = 'spotlight-result-item';
+                item.innerHTML = `<span>${app.icon}</span> <span>${app.name}</span>`;
+                item.onclick = () => {
+                    const appItem = document.querySelector(`.dock-item[data-app="${app.id}"]`);
+                    if (appItem) appItem.click();
+                    toggleSpotlight();
+                };
+                spotlightResults.appendChild(item);
             });
         });
     }
 
-    function getAppContent(app) {
-        switch(app) {
-            case 'finder':
-                return `
-                    <div class="finder-layout">
-                        <div class="sidebar">
-                            <ul class="folder-list">
-                                <li class="folder-item active">Favorites</li>
-                                <li class="folder-item">Applications</li>
-                                <li class="folder-item">Desktop</li>
-                                <li class="folder-item">Documents</li>
-                                <li class="folder-item">Downloads</li>
-                            </ul>
-                        </div>
-                        <div class="file-grid">
-                            <div class="file-item">
-                                <div class="file-icon"></div>
-                                <span>Project 1</span>
-                            </div>
-                            <div class="file-item">
-                                <div class="file-icon"></div>
-                                <span>Resume.pdf</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            case 'safari':
-                return `
-                    <div class="safari-layout">
-                        <div class="address-bar">
-                            <input type="text" value="https://www.apple.com" />
-                        </div>
-                        <div class="safari-content">
-                            <h1>Welcome to Safari</h1>
-                        </div>
-                    </div>
-                `;
-            case 'notes':
-                return `
-                    <div class="notes-layout">
-                        <textarea placeholder="Start typing..."></textarea>
-                    </div>
-                `;
-            case 'calculator':
-                return `
-                    <div class="calc-layout">
-                        <div class="calc-display" id="calc-display">0</div>
-                        <button class="calc-btn gray">AC</button>
-                        <button class="calc-btn gray">+/-</button>
-                        <button class="calc-btn gray">%</button>
-                        <button class="calc-btn orange">÷</button>
-                        <button class="calc-btn">7</button>
-                        <button class="calc-btn">8</button>
-                        <button class="calc-btn">9</button>
-                        <button class="calc-btn orange">×</button>
-                        <button class="calc-btn">4</button>
-                        <button class="calc-btn">5</button>
-                        <button class="calc-btn">6</button>
-                        <button class="calc-btn orange">-</button>
-                        <button class="calc-btn">1</button>
-                        <button class="calc-btn">2</button>
-                        <button class="calc-btn">3</button>
-                        <button class="calc-btn orange">+</button>
-                        <button class="calc-btn" style="grid-column: span 2; width: 110px; border-radius: 25px;">0</button>
-                        <button class="calc-btn">.</button>
-                        <button class="calc-btn orange">=</button>
-                    </div>
-                `;
-            case 'settings':
-                return `
-                    <div class="settings-layout">
-                        <div class="settings-row">
-                            <span>Wi-Fi</span>
-                            <input type="checkbox" checked />
-                        </div>
-                        <div class="settings-row">
-                            <span>Bluetooth</span>
-                            <input type="checkbox" checked />
-                        </div>
-                        <div class="settings-row">
-                            <span>Dark Mode</span>
-                            <input type="checkbox" />
-                        </div>
-                        <div class="settings-row">
-                            <span>Volume</span>
-                            <input type="range" min="0" max="100" value="80" />
-                        </div>
-                    </div>
-                `;
-            default:
-                return `<p>App content coming soon...</p>`;
+    // Global click to close overlays
+    document.addEventListener('click', (e) => {
+        if (spotlightOverlay && spotlightOverlay.style.display === 'block' && !spotlightOverlay.contains(e.target)) {
+            toggleSpotlight();
         }
-    }
+    });
 
     // Launchpad Logic
     const launchpad = document.getElementById('launchpad');
     const launchpadTrigger = document.getElementById('launchpad-trigger');
 
     function toggleLaunchpad() {
-        if (launchpad.style.display === 'none') {
+        if (!launchpad) return;
+        if (launchpad.style.display === 'none' || !launchpad.style.display) {
             launchpad.style.display = 'flex';
             launchpad.style.opacity = '0';
             setTimeout(() => launchpad.style.opacity = '1', 10);
@@ -322,14 +244,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    launchpadTrigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleLaunchpad();
-    });
+    if (launchpadTrigger) {
+        launchpadTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleLaunchpad();
+        });
+    }
 
-    launchpad.addEventListener('click', () => {
-        toggleLaunchpad();
-    });
+    if (launchpad) {
+        launchpad.addEventListener('click', () => {
+            toggleLaunchpad();
+        });
+    }
 
     // Desktop and Dock interaction
     document.querySelectorAll('.dock-item:not(#launchpad-trigger), .desktop-icon, .launchpad-item').forEach(item => {
@@ -338,18 +264,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const app = item.getAttribute('data-app');
             const appTitle = item.getAttribute('title') || app.charAt(0).toUpperCase() + app.slice(1);
 
-            // Check if window already exists
-            const existing = Array.from(windowContainer.children).find(win => win.querySelector('.window-title').textContent === appTitle || win.querySelector('.window-title').textContent === app);
+            const existing = Array.from(windowContainer.children).find(win => win.getAttribute('data-app-id') === app);
             if (existing) {
                 highestZIndex++;
                 existing.style.zIndex = highestZIndex;
-                document.querySelector('.app-name').textContent = appTitle;
+                existing.style.display = 'flex';
+                const appNameEl = document.querySelector('.app-name');
+                if (appNameEl) appNameEl.textContent = appTitle;
                 return;
             }
 
-            // Get App Content
-            const content = getAppContent(app);
-            createWindow(appTitle, content);
+            createWindow(app, appTitle);
         });
     });
 });

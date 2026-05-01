@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal - macOS Mockup</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #000; margin: 0; }
+        .terminal-layout { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div class="terminal-layout">
+        <div class="terminal-output" id="output">Last login: <span id="login-time"></span> on ttys000<br>Welcome to macOS Terminal</div>
+        <div class="terminal-input-line">
+            <span class="terminal-prompt">user@macbook ~ %</span>
+            <input type="text" class="terminal-input" id="input" autofocus />
+        </div>
+    </div>
+    <script>
+        document.getElementById('login-time').textContent = new Date().toLocaleString();
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value.trim();
+                const line = document.createElement('div');
+                line.textContent = `user@macbook ~ % ${cmd}`;
+                line.style.color = '#fff';
+                output.appendChild(line);
+
+                const response = processCommand(cmd);
+                if (response) {
+                    const resLine = document.createElement('div');
+                    resLine.textContent = response;
+                    output.appendChild(resLine);
+                }
+
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+
+        function processCommand(cmd) {
+            const command = cmd.toLowerCase();
+            if (command === 'ls') {
+                return 'Applications  Desktop  Documents  Downloads  Library  Movies  Music  Pictures  Public';
+            } else if (command === 'clear') {
+                output.innerHTML = '';
+                return null;
+            } else if (command === 'help') {
+                return 'Available commands: ls, clear, help, whoami, date';
+            } else if (command === 'whoami') {
+                return 'user';
+            } else if (command === 'date') {
+                return new Date().toString();
+            } else if (command === '') {
+                return null;
+            } else {
+                return `zsh: command not found: ${cmd}`;
+            }
+        }
+
+        // Keep focus on input
+        document.body.addEventListener('click', () => input.focus());
+    </script>
+</body>
+</html>

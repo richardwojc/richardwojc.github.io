@@ -24,6 +24,15 @@
     </div>
 
     <div id="desktop" style="display: none;">
+        <div id="spotlight-overlay" style="display: none;">
+            <div class="spotlight-search">
+                <span class="spotlight-icon">🔍</span>
+                <input type="text" id="spotlight-input" placeholder="Spotlight Search" />
+            </div>
+            <div id="spotlight-results">
+                <!-- Search results will appear here -->
+            </div>
+        </div>
         <header id="menu-bar">
             <div class="menu-left">
                 <span class="apple-logo"></span>
@@ -36,6 +45,7 @@
                 <span class="menu-item">Help</span>
             </div>
             <div class="menu-right">
+                <span class="status-item" id="spotlight-btn">🔍</span>
                 <span class="status-item">Wi-Fi</span>
                 <span class="status-item">Battery</span>
                 <span id="clock"></span>
@@ -74,6 +84,14 @@
                     <div class="launchpad-icon">⚙️</div>
                     <span>Settings</span>
                 </div>
+                <div class="launchpad-item" data-app="terminal">
+                    <div class="launchpad-icon">📟</div>
+                    <span>Terminal</span>
+                </div>
+                <div class="launchpad-item" data-app="appstore">
+                    <div class="launchpad-icon">🏬</div>
+                    <span>App Store</span>
+                </div>
             </div>
         </div>
 
@@ -84,19 +102,25 @@
                 </div>
                 <div class="dock-divider"></div>
                 <div class="dock-item" data-app="finder" title="Finder">
-                    <div class="icon-placeholder">F</div>
+                    <div class="icon-placeholder">📁</div>
                 </div>
                 <div class="dock-item" data-app="safari" title="Safari">
-                    <div class="icon-placeholder">S</div>
+                    <div class="icon-placeholder">🌐</div>
                 </div>
                 <div class="dock-item" data-app="notes" title="Notes">
-                    <div class="icon-placeholder">N</div>
+                    <div class="icon-placeholder">📝</div>
                 </div>
                 <div class="dock-item" data-app="calculator" title="Calculator">
-                    <div class="icon-placeholder">C</div>
+                    <div class="icon-placeholder">🔢</div>
                 </div>
                 <div class="dock-item" data-app="settings" title="System Settings">
                     <div class="icon-placeholder">⚙️</div>
+                </div>
+                <div class="dock-item" data-app="terminal" title="Terminal">
+                    <div class="icon-placeholder">📟</div>
+                </div>
+                <div class="dock-item" data-app="appstore" title="App Store">
+                    <div class="icon-placeholder">🏬</div>
                 </div>
             </div>
         </footer>

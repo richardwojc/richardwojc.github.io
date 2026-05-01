@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator - macOS Mockup</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .calc-layout { background: #333; padding: 15px; border-radius: 12px; box-shadow: var(--window-shadow); }
+    </style>
 </head>
-<body style="background: #f1f1f1; display: flex; justify-content: center; align-items: center; height: 100vh;">
+<body>
     <div class="calc-layout" id="standalone-calc">
         <div class="calc-display" id="calc-display">0</div>
         <button class="calc-btn gray">AC</button>
@@ -30,7 +34,6 @@
         <button class="calc-btn orange">=</button>
     </div>
     <script>
-        // Simple standalone logic for demo
         const display = document.getElementById('calc-display');
         const buttons = document.querySelectorAll('.calc-btn');
         let currentInput = '';

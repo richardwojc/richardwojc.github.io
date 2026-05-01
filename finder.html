@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finder - macOS Mockup</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: var(--bg-color); color: var(--text-color); }
+        .finder-layout { height: 100vh; }
+    </style>
 </head>
-<body style="background: white;">
-    <div class="finder-layout" style="height: 100vh;">
+<body>
+    <div class="finder-layout">
         <div class="sidebar">
             <ul class="folder-list">
                 <li class="folder-item active">Favorites</li>
@@ -17,16 +21,59 @@
                 <li class="folder-item">Downloads</li>
             </ul>
         </div>
-        <div class="file-grid">
-            <div class="file-item">
-                <div class="file-icon"></div>
-                <span>Project 1</span>
-            </div>
-            <div class="file-item">
-                <div class="file-icon"></div>
-                <span>Resume.pdf</span>
-            </div>
+        <div class="file-grid" id="file-grid">
+            <!-- Files will be rendered here -->
         </div>
     </div>
+    <script>
+        const sidebarItems = document.querySelectorAll('.folder-item');
+        const fileGrid = document.getElementById('file-grid');
+
+        const files = {
+            'Favorites': [
+                { name: 'Project 1', icon: '📁' },
+                { name: 'Resume.pdf', icon: '📄' }
+            ],
+            'Applications': [
+                { name: 'Safari', icon: '🌐' },
+                { name: 'Notes', icon: '📝' },
+                { name: 'Calculator', icon: '🔢' }
+            ],
+            'Desktop': [
+                { name: 'Macintosh HD', icon: '📁' }
+            ],
+            'Documents': [
+                { name: 'Budget.xlsx', icon: '📊' },
+                { name: 'Meeting Notes', icon: '📝' }
+            ],
+            'Downloads': [
+                { name: 'Installer.pkg', icon: '📦' }
+            ]
+        };
+
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                renderFiles(item.textContent);
+            });
+        });
+
+        function renderFiles(folder) {
+            fileGrid.innerHTML = '';
+            const folderFiles = files[folder] || [];
+            folderFiles.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-icon" style="display:flex; justify-content:center; align-items:center; font-size:30px;">${file.icon}</div>
+                    <span>${file.name}</span>
+                `;
+                fileGrid.appendChild(fileItem);
+            });
+        }
+
+        renderFiles('Favorites');
+    </script>
 </body>
 </html>

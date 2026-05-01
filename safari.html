@@ -5,15 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safari - macOS Mockup</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: var(--bg-color); color: var(--text-color); }
+        .safari-layout { height: 100vh; }
+    </style>
 </head>
-<body style="background: white;">
-    <div class="safari-layout" style="height: 100vh;">
+<body>
+    <div class="safari-layout">
         <div class="address-bar">
-            <input type="text" value="https://www.apple.com" />
+            <input type="text" id="address-input" value="https://www.apple.com" />
         </div>
         <div class="safari-content">
-            <h1>Welcome to Safari</h1>
+            <h1 id="page-title">Welcome to Safari</h1>
         </div>
     </div>
+    <script>
+        const input = document.getElementById('address-input');
+        const title = document.getElementById('page-title');
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const url = input.value;
+                title.textContent = `Loading ${url}...`;
+                setTimeout(() => {
+                    title.textContent = `Welcome to ${url}`;
+                    document.title = url + " - Safari";
+                }, 1000);
+            }
+        });
+    </script>
 </body>
 </html>

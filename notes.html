@@ -5,10 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes - macOS Mockup</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: var(--bg-color); color: var(--text-color); margin: 0; }
+        .notes-layout { height: 100vh; padding: 20px; }
+    </style>
 </head>
-<body style="background: white;">
-    <div class="notes-layout" style="height: 100vh; padding: 20px;">
-        <textarea placeholder="Start typing..." style="width: 100%; height: 100%; border: none; resize: none; outline: none; font-size: 14px;"></textarea>
+<body>
+    <div class="notes-layout">
+        <textarea placeholder="Start typing..." id="notes-area"></textarea>
     </div>
+    <script>
+        const area = document.getElementById('notes-area');
+        area.value = localStorage.getItem('macos_notes') || '';
+        area.addEventListener('input', () => {
+            localStorage.setItem('macos_notes', area.value);
+        });
+    </script>
 </body>
 </html>

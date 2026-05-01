@@ -5,26 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - macOS Mockup</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: var(--bg-color); color: var(--text-color); padding: 20px; }
+        .settings-layout { max-width: 600px; margin: 0 auto; background: var(--input-bg); padding: 20px; border-radius: 10px; box-shadow: var(--window-shadow); border: 1px solid var(--border-color); }
+    </style>
 </head>
-<body style="background: #f1f1f1; padding: 40px;">
-    <div class="settings-layout" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+<body>
+    <div class="settings-layout">
         <h1>System Settings</h1>
         <div class="settings-row">
-            <span>Wi-Fi</span>
+            <label>Wi-Fi</label>
             <input type="checkbox" checked />
         </div>
         <div class="settings-row">
-            <span>Bluetooth</span>
+            <label>Bluetooth</label>
             <input type="checkbox" checked />
         </div>
         <div class="settings-row">
-            <span>Dark Mode</span>
-            <input type="checkbox" />
+            <label>Dark Mode</label>
+            <input type="checkbox" id="dark-mode-toggle" />
         </div>
         <div class="settings-row">
-            <span>Volume</span>
+            <label>Volume</label>
             <input type="range" min="0" max="100" value="80" />
         </div>
     </div>
+    <script>
+        const toggle = document.getElementById('dark-mode-toggle');
+
+        // Initial state from parent or local body class
+        toggle.checked = document.body.classList.contains('dark-mode');
+
+        toggle.addEventListener('change', () => {
+            const isDark = toggle.checked;
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            // Notify parent
+            window.parent.postMessage({ type: 'toggle-dark-mode', isDark }, '*');
+        });
+
+        // Listen for parent theme changes
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'sync-dark-mode') {
+                if (event.data.isDark) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+                toggle.checked = event.data.isDark;
+            }
+        });
+    </script>
 </body>
 </html>
