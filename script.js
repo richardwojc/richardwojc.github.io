@@ -1,13 +1,123 @@
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(registration => {
+            console.log('SW registered: ', registration);
+        }).catch(registrationError => {
+            console.log('SW registration failed: ', registrationError);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('macOS Mockup initialized');
 
-    // Login Logic
+    // Login & Account Logic
     const loginBtn = document.getElementById('login-btn');
     const loginPassword = document.getElementById('login-password');
     const loginScreen = document.getElementById('login-screen');
     const desktop = document.getElementById('desktop');
+    const userList = document.getElementById('user-list');
+    const userSelection = document.getElementById('user-selection');
+    const passwordScreen = document.getElementById('password-screen');
+    const activeUserAvatar = document.getElementById('active-user-avatar');
+    const activeUserName = document.getElementById('active-user-name');
+    const backToUsers = document.getElementById('back-to-users');
+    const createAccountBtn = document.getElementById('create-account-btn');
+    const setupWizard = document.getElementById('setup-wizard');
+    const finishSetup = document.getElementById('finish-setup');
+    const cancelSetup = document.getElementById('cancel-setup');
+
+    let users = JSON.parse(localStorage.getItem('mac_users')) || [
+        { name: 'Guest', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200&h=200', password: '' }
+    ];
+
+    function renderUsers() {
+        if (!userList) return;
+        userList.innerHTML = '';
+        users.forEach((user, index) => {
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user-item';
+            userDiv.innerHTML = `
+                <img src="${user.avatar}" alt="${user.name}">
+                <span>${user.name}</span>
+            `;
+            userDiv.onclick = () => showPasswordScreen(user);
+            userList.appendChild(userDiv);
+        });
+    }
+
+    function showPasswordScreen(user) {
+        userSelection.style.display = 'none';
+        passwordScreen.style.display = 'flex';
+        activeUserAvatar.src = user.avatar;
+        activeUserName.textContent = user.name;
+        loginPassword.value = '';
+        loginPassword.focus();
+
+        // Store current user session (mock)
+        sessionStorage.setItem('current_user', JSON.stringify(user));
+    }
+
+    if (backToUsers) {
+        backToUsers.onclick = () => {
+            passwordScreen.style.display = 'none';
+            userSelection.style.display = 'flex';
+        };
+    }
+
+    if (createAccountBtn) {
+        createAccountBtn.onclick = () => {
+            userSelection.style.display = 'none';
+            setupWizard.style.display = 'flex';
+        };
+    }
+
+    if (cancelSetup) {
+        cancelSetup.onclick = () => {
+            setupWizard.style.display = 'none';
+            userSelection.style.display = 'flex';
+        };
+    }
+
+    // Avatar Selection Logic
+    document.querySelectorAll('.avatar-opt').forEach(opt => {
+        opt.onclick = () => {
+            document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+        };
+    });
+
+    if (finishSetup) {
+        finishSetup.onclick = () => {
+            const name = document.getElementById('setup-name').value;
+            const password = document.getElementById('setup-password').value;
+            const avatar = document.querySelector('.avatar-opt.selected').getAttribute('data-url');
+
+            if (!name) return alert('Please enter a name');
+
+            users.push({ name, avatar, password });
+            localStorage.setItem('mac_users', JSON.stringify(users));
+            renderUsers();
+            setupWizard.style.display = 'none';
+            userSelection.style.display = 'flex';
+        };
+    }
+
+    // Mock System Sounds
+    const sounds = {
+        boot: new Audio('https://www.soundjay.com/buttons/sounds/beep-01a.mp3'), // Placeholder for boot chime
+        click: new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3')
+    };
 
     function handleLogin() {
+        const currentUser = JSON.parse(sessionStorage.getItem('current_user'));
+        if (currentUser && loginPassword.value !== currentUser.password) {
+            alert('Incorrect password');
+            return;
+        }
+
+        sounds.boot.play().catch(() => {});
         loginScreen.style.opacity = '0';
         setTimeout(() => {
             loginScreen.style.display = 'none';
@@ -21,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') handleLogin();
         });
     }
+
+    renderUsers();
 
     // Update Clock
     function updateClock() {
@@ -126,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         header.addEventListener('mousedown', (e) => {
+            sounds.click.play().catch(() => {});
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -221,10 +334,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Control Center Logic
+    const controlCenter = document.getElementById('control-center');
+    const ccBtn = document.getElementById('control-center-btn');
+
+    function toggleControlCenter() {
+        if (!controlCenter) return;
+        if (controlCenter.style.display === 'none' || !controlCenter.style.display) {
+            controlCenter.style.display = 'block';
+        } else {
+            controlCenter.style.display = 'none';
+        }
+    }
+
+    if (ccBtn) {
+        ccBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleControlCenter();
+        });
+    }
+
     // Global click to close overlays
     document.addEventListener('click', (e) => {
         if (spotlightOverlay && spotlightOverlay.style.display === 'block' && !spotlightOverlay.contains(e.target)) {
             toggleSpotlight();
+        }
+        if (controlCenter && controlCenter.style.display === 'block' && !controlCenter.contains(e.target) && e.target !== ccBtn) {
+            toggleControlCenter();
         }
     });
 

@@ -14,12 +14,18 @@ async def verify_macos_ui():
             browser = await p.chromium.launch()
             page = await browser.new_page(viewport={'width': 1280, 'height': 800})
 
-            # 1. Verify Login Screen
+            # 1. Verify Login Screen (User Selection)
             await page.goto('http://localhost:8001')
-            await page.wait_for_selector('#login-screen')
+            await page.wait_for_selector('#user-selection')
 
-            # Check for avatar image
-            avatar_img = await page.query_selector('.user-avatar img')
+            # Click on the first user (Guest)
+            await page.click('.user-item')
+
+            # Wait for password screen
+            await page.wait_for_selector('#password-screen', state='visible')
+
+            # Check for avatar image in password screen
+            avatar_img = await page.query_selector('#active-user-avatar')
             assert avatar_img is not None
             src = await avatar_img.get_attribute('src')
             assert 'unsplash' in src
@@ -29,7 +35,7 @@ async def verify_macos_ui():
             print("Captured login screen screenshot.")
 
             # 2. Login and Verify Desktop
-            await page.fill('#login-password', 'password')
+            # Guest has empty password in mock data
             await page.click('#login-btn')
 
             await page.wait_for_selector('#desktop', state='visible')

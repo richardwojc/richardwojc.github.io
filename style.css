@@ -40,7 +40,7 @@ body, html {
 #login-screen {
     width: 100%;
     height: 100%;
-    background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=2000') no-repeat center center fixed;
+    background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1611000657256-114413c90e11?auto=format&fit=crop&q=80&w=2000') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     justify-content: center;
@@ -81,6 +81,100 @@ body, html {
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 20px;
+}
+
+/* Multi-user styles */
+.user-list {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.user-item {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.user-item:hover {
+    transform: scale(1.05);
+}
+
+.user-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.user-item span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.setup-form {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    padding: 30px;
+    border-radius: 20px;
+    width: 350px;
+    margin: 20px auto;
+}
+
+.setup-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+}
+
+.avatar-selection {
+    margin-bottom: 20px;
+}
+
+.avatar-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.avatar-opt {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.avatar-opt.selected {
+    border-color: #007aff;
+}
+
+.setup-form button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #007aff;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.setup-form button.secondary {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#create-account-btn {
+    cursor: pointer;
 }
 
 .password-field {
@@ -131,7 +225,7 @@ body, html {
 #desktop {
     width: 100%;
     height: 100%;
-    background: url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=2000') no-repeat center center fixed;
+    background: url('https://images.unsplash.com/photo-1611000657256-114413c90e11?auto=format&fit=crop&q=80&w=2000') no-repeat center center fixed;
     background-size: cover;
     position: relative;
     display: flex;
@@ -268,6 +362,99 @@ body, html {
     height: 40px;
     background: rgba(255,255,255,0.2);
     align-self: center;
+}
+
+/* Control Center */
+#control-center {
+    position: fixed;
+    top: 35px;
+    right: 10px;
+    width: 320px;
+    background: var(--bg-color);
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
+    border-radius: 18px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--window-shadow);
+    padding: 15px;
+    z-index: 2000;
+}
+
+.cc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.cc-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.cc-item.large {
+    grid-column: span 2;
+}
+
+.cc-sub-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cc-sub-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.cc-sub-item.active span {
+    background: #007aff;
+    padding: 4px;
+    border-radius: 50%;
+    color: white;
+}
+
+.cc-item.small {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.cc-music {
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.music-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.music-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.song-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.artist {
+    font-size: 11px;
+    opacity: 0.6;
 }
 
 /* Spotlight Search */

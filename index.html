@@ -8,24 +8,75 @@
 </head>
 <body>
     <div id="login-screen">
-        <div class="login-content">
-            <div class="user-avatar">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200&h=200" alt="User Profile">
+        <div id="user-selection" class="login-content">
+            <div id="user-list" class="user-list">
+                <!-- Users will be populated here -->
             </div>
-            <div class="user-name">Alex Smith</div>
+            <div class="login-footer">
+                <span id="create-account-btn">Create Account</span>
+                <span>Sleep</span>
+                <span>Restart</span>
+            </div>
+        </div>
+
+        <div id="password-screen" class="login-content" style="display: none;">
+            <div class="user-avatar">
+                <img id="active-user-avatar" src="" alt="User Profile">
+            </div>
+            <div id="active-user-name" class="user-name"></div>
             <div class="password-field">
                 <input type="password" id="login-password" placeholder="Enter Password" />
                 <button id="login-btn">→</button>
             </div>
             <div class="login-footer">
-                <span>Sleep</span>
-                <span>Restart</span>
-                <span>Shut Down</span>
+                <span id="back-to-users">Cancel</span>
+            </div>
+        </div>
+
+        <div id="setup-wizard" class="login-content" style="display: none;">
+            <h2>Create Your Account</h2>
+            <div class="setup-form">
+                <input type="text" id="setup-name" placeholder="Full Name" />
+                <input type="password" id="setup-password" placeholder="Password" />
+                <div class="avatar-selection">
+                    <p>Choose an Avatar</p>
+                    <div class="avatar-options">
+                        <img class="avatar-opt selected" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200&h=200">
+                        <img class="avatar-opt" src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200">
+                        <img class="avatar-opt" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200">
+                    </div>
+                </div>
+                <button id="finish-setup">Create Account</button>
+                <button id="cancel-setup" class="secondary">Cancel</button>
             </div>
         </div>
     </div>
 
     <div id="desktop" style="display: none;">
+        <div id="control-center" style="display: none;">
+            <div class="cc-grid">
+                <div class="cc-item large">
+                    <div class="cc-sub-grid">
+                        <div class="cc-sub-item active"><span>📡</span> Wi-Fi</div>
+                        <div class="cc-sub-item active"><span>🦷</span> Bluetooth</div>
+                        <div class="cc-sub-item"><span>✈️</span> AirDrop</div>
+                    </div>
+                </div>
+                <div class="cc-item small"><span>🌙</span> Focus</div>
+                <div class="cc-item small"><span>🔆</span> Display</div>
+                <div class="cc-item small"><span>🔊</span> Sound</div>
+            </div>
+            <div class="cc-music">
+                <div class="music-info">
+                    <img src="https://images.unsplash.com/photo-1614149162883-504ce4d13909?auto=format&fit=crop&w=40&h=40" alt="Music">
+                    <div>
+                        <div class="song-title">Not Playing</div>
+                        <div class="artist">Music</div>
+                    </div>
+                </div>
+                <div class="music-controls">⏯️ ⏭️</div>
+            </div>
+        </div>
         <div id="spotlight-overlay" style="display: none;">
             <div class="spotlight-search">
                 <span class="spotlight-icon">🔍</span>
@@ -48,8 +99,8 @@
             </div>
             <div class="menu-right">
                 <span class="status-item" id="spotlight-btn">🔍</span>
+                <span class="status-item" id="control-center-btn">🎛️</span>
                 <span class="status-item">Wi-Fi</span>
-                <span class="status-item">Battery</span>
                 <span id="clock"></span>
             </div>
         </header>
@@ -99,30 +150,63 @@
 
         <footer id="dock-container">
             <div id="dock">
-                <div class="dock-item" id="launchpad-trigger" title="Launchpad">
-                    <div class="icon-placeholder">🚀</div>
-                </div>
-                <div class="dock-divider"></div>
                 <div class="dock-item" data-app="finder" title="Finder">
                     <div class="icon-placeholder">📁</div>
+                </div>
+                <div class="dock-item" data-app="calendar" title="Calendar">
+                    <div class="icon-placeholder">📅</div>
                 </div>
                 <div class="dock-item" data-app="safari" title="Safari">
                     <div class="icon-placeholder">🌐</div>
                 </div>
+                <div class="dock-item" data-app="messages" title="Messages">
+                    <div class="icon-placeholder">💬</div>
+                </div>
+                <div class="dock-item" data-app="mail" title="Mail">
+                    <div class="icon-placeholder">📧</div>
+                </div>
+                <div class="dock-item" data-app="maps" title="Maps">
+                    <div class="icon-placeholder">🗺️</div>
+                </div>
+                <div class="dock-item" data-app="photos" title="Photos">
+                    <div class="icon-placeholder">🖼️</div>
+                </div>
+                <div class="dock-item" data-app="facetime" title="FaceTime">
+                    <div class="icon-placeholder">📹</div>
+                </div>
+                <div class="dock-item" data-app="iphone-mirror" title="iPhone Mirroring">
+                    <div class="icon-placeholder">📱</div>
+                </div>
                 <div class="dock-item" data-app="notes" title="Notes">
                     <div class="icon-placeholder">📝</div>
                 </div>
-                <div class="dock-item" data-app="calculator" title="Calculator">
-                    <div class="icon-placeholder">🔢</div>
+                <div class="dock-item" data-app="reminders" title="Reminders">
+                    <div class="icon-placeholder">🔔</div>
+                </div>
+                <div class="dock-item" data-app="freeform" title="Freeform">
+                    <div class="icon-placeholder">🎨</div>
+                </div>
+                <div class="dock-item" data-app="tv" title="TV">
+                    <div class="icon-placeholder">📺</div>
+                </div>
+                <div class="dock-item" data-app="music" title="Music">
+                    <div class="icon-placeholder">🎵</div>
+                </div>
+                <div class="dock-item" data-app="news" title="News">
+                    <div class="icon-placeholder">📰</div>
+                </div>
+                <div class="dock-item" id="launchpad-trigger" title="Launchpad">
+                    <div class="icon-placeholder">🚀</div>
+                </div>
+                <div class="dock-item" data-app="appstore" title="App Store">
+                    <div class="icon-placeholder">🏬</div>
                 </div>
                 <div class="dock-item" data-app="settings" title="System Settings">
                     <div class="icon-placeholder">⚙️</div>
                 </div>
-                <div class="dock-item" data-app="terminal" title="Terminal">
-                    <div class="icon-placeholder">📟</div>
-                </div>
-                <div class="dock-item" data-app="appstore" title="App Store">
-                    <div class="icon-placeholder">🏬</div>
+                <div class="dock-divider"></div>
+                <div class="dock-item" data-app="bin" title="Trash">
+                    <div class="icon-placeholder">🗑️</div>
                 </div>
             </div>
         </footer>

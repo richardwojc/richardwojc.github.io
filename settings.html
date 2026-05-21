@@ -29,9 +29,34 @@
             <label>Volume</label>
             <input type="range" min="0" max="100" value="80" />
         </div>
+        <div class="settings-section">
+            <h2>Users & Groups</h2>
+            <div id="settings-user-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
     </div>
     <script>
         const toggle = document.getElementById('dark-mode-toggle');
+        const settingsUserList = document.getElementById('settings-user-list');
+
+        function renderSettingsUsers() {
+            const users = JSON.parse(localStorage.getItem('mac_users')) || [];
+            settingsUserList.innerHTML = '';
+            users.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'settings-row';
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${user.avatar}" style="width:30px; height:30px; border-radius:50%;">
+                        <span>${user.name}</span>
+                    </div>
+                    <span style="opacity:0.6; font-size:12px;">Admin</span>
+                `;
+                settingsUserList.appendChild(div);
+            });
+        }
+        renderSettingsUsers();
 
         // Initial state from parent or local body class
         toggle.checked = document.body.classList.contains('dark-mode');
