@@ -26,11 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const createAccountBtn = document.getElementById('create-account-btn');
     const setupWizard = document.getElementById('setup-wizard');
     const finishSetup = document.getElementById('finish-setup');
-    const cancelSetup = document.getElementById('cancel-setup');
 
-    let users = JSON.parse(localStorage.getItem('mac_users')) || [
-        { name: 'Guest', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200&h=200', password: '' }
-    ];
+    let users = JSON.parse(localStorage.getItem('mac_users')) || [];
+
+    function checkFirstRun() {
+        if (users.length === 0) {
+            userSelection.style.display = 'none';
+            setupWizard.style.display = 'flex';
+        } else {
+            renderUsers();
+        }
+    }
 
     function renderUsers() {
         if (!userList) return;
@@ -73,12 +79,43 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    if (cancelSetup) {
-        cancelSetup.onclick = () => {
-            setupWizard.style.display = 'none';
-            userSelection.style.display = 'flex';
+    // Setup Wizard Navigation
+    document.querySelectorAll('.next-step').forEach(btn => {
+        btn.onclick = () => {
+            const currentStep = btn.closest('.setup-step');
+            const nextStepId = `setup-step-${btn.getAttribute('data-next')}`;
+            currentStep.style.display = 'none';
+            document.getElementById(nextStepId).style.display = 'block';
         };
-    }
+    });
+
+    document.querySelectorAll('.prev-step').forEach(btn => {
+        btn.onclick = () => {
+            const currentStep = btn.closest('.setup-step');
+            const prevStepId = `setup-step-${btn.getAttribute('data-prev')}`;
+            currentStep.style.display = 'none';
+            document.getElementById(prevStepId).style.display = 'block';
+        };
+    });
+
+    // Language selection
+    document.querySelectorAll('.lang-item').forEach(item => {
+        item.onclick = () => {
+            document.querySelectorAll('.lang-item').forEach(i => i.classList.remove('selected'));
+            item.classList.add('selected');
+        };
+    });
+
+    // Theme selection
+    document.querySelectorAll('.theme-opt').forEach(opt => {
+        opt.onclick = () => {
+            document.querySelectorAll('.theme-opt').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            const theme = opt.getAttribute('data-theme');
+            if (theme === 'dark') document.body.classList.add('dark-mode');
+            else document.body.classList.remove('dark-mode');
+        };
+    });
 
     // Avatar Selection Logic
     document.querySelectorAll('.avatar-opt').forEach(opt => {
@@ -98,9 +135,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             users.push({ name, avatar, password });
             localStorage.setItem('mac_users', JSON.stringify(users));
-            renderUsers();
-            setupWizard.style.display = 'none';
-            userSelection.style.display = 'flex';
+
+            document.getElementById('setup-step-3').style.display = 'none';
+            document.getElementById('setup-step-final').style.display = 'block';
+
+            setTimeout(() => {
+                renderUsers();
+                setupWizard.style.display = 'none';
+                userSelection.style.display = 'flex';
+                // Reset steps for next time
+                document.querySelectorAll('.setup-step').forEach(s => s.style.display = 'none');
+                document.getElementById('setup-step-1').style.display = 'block';
+            }, 2000);
         };
     }
 
@@ -132,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    renderUsers();
+    checkFirstRun();
 
     // Update Clock
     function updateClock() {
@@ -265,6 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Theme Management via postMessage
     window.addEventListener('message', (event) => {
+        if (event.data.type === 'close-app') {
+            const win = document.querySelector(`.window[data-app-id="${event.data.appId}"]`);
+            if (win) win.querySelector('.close').click();
+        }
+
         if (event.data.type === 'toggle-dark-mode') {
             if (event.data.isDark) {
                 document.body.classList.add('dark-mode');

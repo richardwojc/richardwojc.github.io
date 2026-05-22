@@ -34,20 +34,75 @@
         </div>
 
         <div id="setup-wizard" class="login-content" style="display: none;">
-            <h2>Create Your Account</h2>
-            <div class="setup-form">
-                <input type="text" id="setup-name" placeholder="Full Name" />
-                <input type="password" id="setup-password" placeholder="Password" />
-                <div class="avatar-selection">
-                    <p>Choose an Avatar</p>
-                    <div class="avatar-options">
-                        <img class="avatar-opt selected" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200&h=200">
-                        <img class="avatar-opt" src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200">
-                        <img class="avatar-opt" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200">
+            <div class="setup-assistant">
+                <div id="setup-step-1" class="setup-step">
+                    <h1>Welcome</h1>
+                    <p>Select your language to get started with macOS Tahoe.</p>
+                    <div class="language-list">
+                        <div class="lang-item selected">English</div>
+                        <div class="lang-item">Español</div>
+                        <div class="lang-item">Français</div>
+                        <div class="lang-item">Deutsch</div>
+                        <div class="lang-item">日本語</div>
+                    </div>
+                    <div class="setup-buttons">
+                        <button class="next-step" data-next="2">Continue</button>
                     </div>
                 </div>
-                <button id="finish-setup">Create Account</button>
-                <button id="cancel-setup" class="secondary">Cancel</button>
+
+                <div id="setup-step-2" class="setup-step" style="display: none;">
+                    <h1>Create Computer Account</h1>
+                    <p>Enter a full name and password to create your account.</p>
+                    <div class="setup-form">
+                        <input type="text" id="setup-name" placeholder="Full Name" />
+                        <input type="text" id="setup-username" placeholder="Account Name" />
+                        <input type="password" id="setup-password" placeholder="Password" />
+                        <input type="text" id="setup-hint" placeholder="Password Hint" />
+
+                        <div class="avatar-selection">
+                            <p>Choose an Avatar</p>
+                            <div class="avatar-options">
+                                <img class="avatar-opt selected" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200&h=200">
+                                <img class="avatar-opt" src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200">
+                                <img class="avatar-opt" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100" data-url="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setup-buttons">
+                        <button class="prev-step" data-prev="1">Back</button>
+                        <button class="next-step" data-next="3">Continue</button>
+                    </div>
+                </div>
+
+                <div id="setup-step-3" class="setup-step" style="display: none;">
+                    <h1>Choose Your Look</h1>
+                    <p>Select how you want macOS Tahoe to look.</p>
+                    <div class="theme-selection">
+                        <div class="theme-opt selected" data-theme="light">
+                            <div class="theme-preview light"></div>
+                            <span>Light</span>
+                        </div>
+                        <div class="theme-opt" data-theme="dark">
+                            <div class="theme-preview dark"></div>
+                            <span>Dark</span>
+                        </div>
+                        <div class="theme-opt" data-theme="auto">
+                            <div class="theme-preview auto"></div>
+                            <span>Auto</span>
+                        </div>
+                    </div>
+                    <div class="setup-buttons">
+                        <button class="prev-step" data-prev="2">Back</button>
+                        <button id="finish-setup">Done</button>
+                    </div>
+                </div>
+
+                <div id="setup-step-final" class="setup-step" style="display: none;">
+                    <div class="setup-loading">
+                        <div class="spinner"></div>
+                        <p>Setting Up Your Mac...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -144,6 +199,10 @@
                 <div class="launchpad-item" data-app="appstore">
                     <div class="launchpad-icon">🏬</div>
                     <span>App Store</span>
+                </div>
+                <div class="launchpad-item" data-app="installer">
+                    <div class="launchpad-icon">📦</div>
+                    <span>Installer</span>
                 </div>
             </div>
         </div>

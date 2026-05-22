@@ -114,13 +114,56 @@ body, html {
     font-weight: 500;
 }
 
-.setup-form {
+.setup-assistant {
     background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(20px);
-    padding: 30px;
-    border-radius: 20px;
-    width: 350px;
-    margin: 20px auto;
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
+    padding: 40px;
+    border-radius: 24px;
+    width: 600px;
+    min-height: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.setup-step h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.setup-step p {
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.language-list {
+    background: rgba(0,0,0,0.1);
+    border-radius: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.lang-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.lang-item:hover, .lang-item.selected {
+    background: #007aff;
+    color: white;
+}
+
+.setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .setup-form input {
@@ -157,20 +200,79 @@ body, html {
     border-color: #007aff;
 }
 
-.setup-form button {
-    width: 100%;
-    padding: 10px;
+.setup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+.setup-buttons button {
+    padding: 10px 25px;
     border-radius: 8px;
     border: none;
     background: #007aff;
     color: white;
     font-weight: 500;
     cursor: pointer;
-    margin-bottom: 10px;
+    transition: opacity 0.2s;
 }
 
-.setup-form button.secondary {
+.setup-buttons button.prev-step {
     background: rgba(255, 255, 255, 0.2);
+}
+
+.setup-buttons button:hover {
+    opacity: 0.8;
+}
+
+.theme-selection {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.theme-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.theme-preview {
+    width: 100px;
+    height: 70px;
+    border-radius: 8px;
+    border: 3px solid transparent;
+}
+
+.theme-opt.selected .theme-preview {
+    border-color: #007aff;
+}
+
+.theme-preview.light { background: white; }
+.theme-preview.dark { background: #333; }
+.theme-preview.auto { background: linear-gradient(135deg, white 50%, #333 50%); }
+
+.setup-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255,255,255,0.1);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 #create-account-btn {

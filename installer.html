@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installer - macOS Mockup</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: var(--bg-color); color: var(--text-color); font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .installer-container { background: var(--input-bg); width: 100%; height: 100%; display: flex; flex-direction: column; }
+        .installer-sidebar { width: 180px; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); padding: 40px 20px; }
+        .installer-content { flex-grow: 1; padding: 60px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .step-list { list-style: none; padding: 0; }
+        .step-item { padding: 8px 0; font-size: 13px; opacity: 0.5; position: relative; }
+        .step-item.active { opacity: 1; font-weight: bold; }
+        .step-item.active::before { content: '•'; position: absolute; left: -15px; color: #007aff; }
+        .installer-icon { font-size: 80px; margin-bottom: 20px; }
+        .installer-buttons { margin-top: auto; padding: 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); }
+        .installer-buttons button { padding: 6px 16px; border-radius: 6px; border: 1px solid #ccc; background: white; cursor: pointer; }
+        .installer-buttons button.primary { background: #007aff; color: white; border: none; }
+        .install-progress-container { width: 300px; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; margin: 20px 0; overflow: hidden; }
+        .install-progress-bar { height: 100%; background: #007aff; width: 0%; transition: width 0.1s; }
+    </style>
+</head>
+<body>
+    <div class="installer-container">
+        <div style="display: flex; flex-grow: 1;">
+            <div class="installer-sidebar">
+                <ul class="step-list">
+                    <li class="step-item active" id="step-intro">Introduction</li>
+                    <li class="step-item" id="step-license">License</li>
+                    <li class="step-item" id="step-destination">Destination Select</li>
+                    <li class="step-item" id="step-installation">Installation</li>
+                    <li class="step-item" id="step-summary">Summary</li>
+                </ul>
+            </div>
+            <div class="installer-content">
+                <div id="intro-view">
+                    <div class="installer-icon">📦</div>
+                    <h1>Install New User</h1>
+                    <p>This package will guide you through the steps necessary to install a new user profile on this Mac.</p>
+                </div>
+
+                <div id="license-view" style="display: none;">
+                    <h1>Software License Agreement</h1>
+                    <div style="background: white; border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 11px; height: 150px; overflow-y: scroll; margin: 20px 0;">
+                        <p>IMPORTANT - READ CAREFULLY: This macOS Mockup Software License Agreement is a legal agreement between you and Jules. By using this software, you agree to be bound by the terms of this agreement.</p>
+                        <p>1. Grant of License. Jules grants you a non-exclusive license to use the software for the purpose of pretending you have a Mac.</p>
+                        <p>2. Restrictions. You may not sell this mockup to Apple Inc.</p>
+                    </div>
+                </div>
+
+                <div id="destination-view" style="display: none;">
+                    <h1>Select a Destination</h1>
+                    <p>Select the disk where you want to install the user profile.</p>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px;">
+                        <div style="border: 2px solid #007aff; border-radius: 8px; padding: 20px; width: 120px;">
+                            <div style="font-size: 40px;">💾</div>
+                            <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Macintosh HD</div>
+                            <div style="font-size: 11px; opacity: 0.6;">499 GB free</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="install-view" style="display: none;">
+                    <h1>Installing User Profile</h1>
+                    <p>Registering user data and assets...</p>
+                    <div class="install-progress-container">
+                        <div class="install-progress-bar" id="progress-bar"></div>
+                    </div>
+                    <p id="progress-text" style="font-size: 12px; opacity: 0.6;">Less than a minute remaining</p>
+                </div>
+
+                <div id="summary-view" style="display: none;">
+                    <div style="font-size: 60px; color: #27c93f; margin-bottom: 20px;">✅</div>
+                    <h1>The installation was successful.</h1>
+                    <p>The new user "Jane Doe" has been installed successfully.</p>
+                </div>
+            </div>
+        </div>
+        <div class="installer-buttons">
+            <button id="btn-back" disabled>Go Back</button>
+            <button id="btn-next" class="primary">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const steps = ['intro', 'license', 'destination', 'installation', 'summary'];
+        const btnNext = document.getElementById('btn-next');
+        const btnBack = document.getElementById('btn-back');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateView() {
+            steps.forEach((step, index) => {
+                const view = document.getElementById(step + '-view');
+                const sidebarItem = document.getElementById('step-' + step);
+                if (index === currentStep) {
+                    view.style.display = 'block';
+                    sidebarItem.classList.add('active');
+                } else {
+                    view.style.display = 'none';
+                    sidebarItem.classList.remove('active');
+                }
+            });
+
+            btnBack.disabled = currentStep === 0 || currentStep === 3 || currentStep === 4;
+
+            if (currentStep === 3) {
+                btnNext.disabled = true;
+                startInstallation();
+            } else if (currentStep === 4) {
+                btnNext.textContent = 'Close';
+                btnNext.disabled = false;
+            } else {
+                btnNext.textContent = 'Continue';
+                btnNext.disabled = false;
+            }
+        }
+
+        function startInstallation() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    currentStep++;
+
+                    // Actually add a mock user
+                    const users = JSON.parse(localStorage.getItem('mac_users')) || [];
+                    users.push({
+                        name: 'Jane Doe',
+                        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200',
+                        password: 'password'
+                    });
+                    localStorage.setItem('mac_users', JSON.stringify(users));
+
+                    updateView();
+                }
+                progressBar.style.width = progress + '%';
+            }, 200);
+        }
+
+        btnNext.onclick = () => {
+            if (currentStep === 4) {
+                // In a real app we'd close the window, here we just refresh/notify
+                window.parent.postMessage({ type: 'close-app', appId: 'installer' }, '*');
+            } else {
+                currentStep++;
+                updateView();
+            }
+        };
+
+        btnBack.onclick = () => {
+            currentStep--;
+            updateView();
+        };
+
+        // Dark mode sync
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'sync-dark-mode') {
+                if (event.data.isDark) document.body.classList.add('dark-mode');
+                else document.body.classList.remove('dark-mode');
+            }
+        });
+    </script>
+</body>
+</html>
